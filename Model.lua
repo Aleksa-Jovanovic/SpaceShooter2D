@@ -32,7 +32,7 @@ Model.shipParams = {
 
 Model.enemyL1Params = {
     assetName = "enemy",
-    tag = "Enemy1",
+    tag = "EnemyL1",
 
     speed = 50,
     health = 100,
@@ -42,15 +42,11 @@ Model.enemyL1Params = {
 
 Model.bulletParams = {
     assetName = "bullet",
-    tag = "bullet",
-    speed = 100,
-}
+    tag = "Bullet",
 
---[[
-function Model.spacePartionParam.calculatePartion()
-    
-end
-]]
+    speed = 100,
+    damage = 25
+}
 
 
 Model.init = function()

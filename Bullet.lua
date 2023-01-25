@@ -1,24 +1,19 @@
 local classes = require("classes")
-local Bullet = classes.class()
+local BaseObject = require("BaseObject")
+local Bullet = classes.class(BaseObject)
 
 local Model = require("Model")
 local LocalMath = require("LocalMath")
 
 function Bullet:init(params)
-    self.tag = params.tag or "bullet"
-    self.speed = params.speed or 100
+    BaseObject.init(self, params) --tag,img,pos
 
-    local positionVec = params.position or { x = 0, y = 0 }
-    self.position = positionVec
-    local directionVec = params.direction or { x = 0, y = 0 }
-    self.direction = directionVec
+    self.speed = params.speed or 100
+    self.damage = params.damage or 50
+    self.direction = params.direction or { x = 0, y = 0 }
 
     self.angleModifier = params.angleModifier or 1 --!TO BE REMOVED
     self.angle = LocalMath.calculateAngleFromDirectionVector(self.direction)
-
-    self.asset = params.asset
-    self.w = self.asset:getWidth()
-    self.h = self.asset:getHeight()
 end
 
 --If you dont want to change all of the values you can leave them as nil!
@@ -74,7 +69,7 @@ function Bullet:draw()
     local x = self.position.x
     local y = self.position.y
 
-    love.graphics.draw(self.asset, x, y, self.angle, 1, 1, self.w / 2, self.h / 2)
+    love.graphics.draw(self.asset, x, y, self.angle, 1, 1, self.dimention.width / 2, self.dimention.height / 2)
 end
 
 return Bullet

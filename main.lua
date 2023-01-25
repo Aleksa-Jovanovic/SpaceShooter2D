@@ -23,13 +23,8 @@ local ShipCls = require("Ship") --import the class
 local ship = nil
 
 local EnemyCls = require("Enemy")
-local enemy = nil
-local enemies = nil
 local spawnRate = 0.5
 local spawnCountdown = 0
-
-local BulletsCls = require("Bullets")
-local bullets = nil
 
 local AssetsManager = require("AssetsManager")
 local Model = require("Model")
@@ -53,6 +48,27 @@ local function spawnEnemy(dt)
     end
 end
 
+local function checkColision(object1, object2)
+    local colider1 = { position = {}, dimention = {} }
+    local colider2 = { position = {}, dimention = {} }
+
+    colider1.position.x = object1.position.x - object1.dimention.width / 2
+    colider1.position.y = object1.position.y - object1.dimention.height / 2
+    colider1.dimention = object1.dimention
+
+    colider2.position.x = object2.position.x - object2.dimention.width / 2
+    colider2.position.y = object2.position.y - object2.dimention.height / 2
+    colider2.dimention = object2.dimention
+
+    if (colider1.position.x < colider2.position.x + colider2.dimention.width and
+        colider1.position.x + colider1.dimention.width > colider2.position.x and
+        colider1.position.y < colider2.position.y + colider2.dimention.height and
+        colider1.position.y + colider1.dimention.height > colider2.position.y) then
+        return true
+    end
+    return false
+end
+
 function love.load()
     print("love.load")
     AssetsManager.init()
@@ -72,6 +88,17 @@ function love.update(dt)
 
     objectManager:update(dt)
     spawnEnemy(dt)
+
+
+    for enemyIndex, enemy in pairs(objectManager.enemies.liveObjectArray) do
+        for bulletIndex, bullet in pairs(objectManager.bullets.playerBulletsArray) do
+            if (checkColision(bullet, enemy)) then
+                objectManager.enemies:removeObject(enemyIndex)
+                objectManager.bullets:removePlayerBullet(bulletIndex)
+                break
+            end
+        end
+    end
 
 
     spacePartion:updateSpaceMatrix({ ship }, dt)
