@@ -55,10 +55,21 @@ function LocalMath.calculateDirectionVectorFromAngle(angle)
     return directionVector
 end
 
---Returns true if vector already exists in the vector array
+--Returns true if vector(x,y) already exists in the vector array
 function LocalMath.isVectorContainedInContainer(vector, container)
     for _, elem in ipairs(container) do
         if (vector.x == elem.x) and (vector.y == elem.y) then
+            return true
+        end
+    end
+
+    return false
+end
+
+--Returns true if index(row,col) already exists in the index array
+function LocalMath.isIndexContainedInContainer(vector, container)
+    for _, elem in ipairs(container) do
+        if (vector.col == elem.col) and (vector.row == elem.row) then
             return true
         end
     end

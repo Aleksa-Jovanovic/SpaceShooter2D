@@ -11,7 +11,8 @@ local Model = {
 
 Model.spacePartitionParam = {
     rowNumber = 20,
-    colNumber = 10
+    colNumber = 10,
+    updateRate = 0.002
 }
 
 Model.starsParams = {

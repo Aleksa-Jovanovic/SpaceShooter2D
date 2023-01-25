@@ -1,6 +1,8 @@
 local classes = require("classes")
 local SpacePartition = classes.class()
+
 local Model = require("Model")
+local LocalMath = require("LocalMath")
 
 function SpacePartition:init(params)
     self.colNum = Model.spacePartitionParam.colNumber
@@ -12,7 +14,17 @@ function SpacePartition:init(params)
     self.cellWidt = math.ceil(self.stageWidth / self.colNum)
     self.cellHeight = math.ceil(self.stageHeight / self.rowNum)
 
+    --Maybe we dont need to update spaceMatrix on every love.update(dt)
+    --It can update once every 1/updateRate
+    self.updateRate = params.updateRate or 10
+    self.updateCooldown = 0
+
     --Each element of matrix contains objects that are in that part of the screen
+    self.spaceMatrix = self:reInitSpaceMatric()
+end
+
+--Fast way to empty a matrix and just create a new one, maybe its faster to iterate and set everything to nils
+function SpacePartition:reInitSpaceMatric()
     self.spaceMatrix = {}
     for i = 1, self.rowNum, 1 do
         self.spaceMatrix[i] = {}
@@ -21,8 +33,10 @@ function SpacePartition:init(params)
         end
     end
 
+    return self.spaceMatrix
 end
 
+--Returns index of a cell that contains that position(x,y)
 function SpacePartition:calculateIndexOfPoint(position)
     local x = position.x or 0
     local y = position.y or 0
@@ -39,12 +53,14 @@ function SpacePartition:calculateIndexOfPoint(position)
         row = row + 1
     end
 
-    --print("Row : " .. row .. " Col : " .. col)
     return { row = row, col = col }
 end
 
---Returns indexes of all elements that could contain object whit that position
-function SpacePartition:calculateIndexesOfObject(object, objectPosition, objectDimention)
+--Returns indexes of all cells that could contain object whit that position
+function SpacePartition:calculateIndexesOfObject(object)
+    local objectPosition = object.position
+    local objectDimention = object.dimention
+
     local leftTopCorner = { x = objectPosition.x - objectDimention.width / 2,
         y = objectPosition.y - objectDimention.height / 2 }
     local leftBottomCorner = { x = objectPosition.x - objectDimention.width / 2,
@@ -55,21 +71,63 @@ function SpacePartition:calculateIndexesOfObject(object, objectPosition, objectD
         y = objectPosition.y + objectDimention.height / 2 }
 
     local conrners = { leftTopCorner, leftBottomCorner, rightTopCorner, rightBottomCorner }
-
-    for index, corner in ipairs(conrners) do
+    local differentIndexes = {}
+    for _, corner in ipairs(conrners) do
         local index = self:calculateIndexOfPoint({ x = corner.x, y = corner.y })
-        local i = index.row
-        local j = index.col
 
-        self.spaceMatrix[i][j][objectPosition.y * (self.stageWidth - 1) + objectPosition.x] = object
-
-        print(self.spaceMatrix[i][j][objectPosition.y * (self.stageWidth - 1) + objectPosition.x].tag)
+        if (not LocalMath.isIndexContainedInContainer(index, differentIndexes)) then
+            table.insert(differentIndexes, index)
+        end
     end
-    print("---------------------------------------")
+
+    return differentIndexes
 end
 
-function SpacePartition:update(dt)
+function SpacePartition.calculatePreciseIndex(objectPosition, stageWith)
+    return objectPosition.y * (stageWith) + objectPosition.x
+end
 
+--TODO: check and see should you use some kind of preciseIndex
+function SpacePartition:storeObjectIntoSpaceMatrix(object)
+    local objectIndexes = self:calculateIndexesOfObject(object)
+
+    for _, index in ipairs(objectIndexes) do
+        local i = index.row
+        local j = index.col
+        local preciseIndex = SpacePartition.calculatePreciseIndex(object.position, self.stageWidth)
+
+        --!self.spaceMatrix[i][j][preciseIndex] = object
+        table.insert(self.spaceMatrix[i][j], object)
+        --!print(#self.spaceMatrix[i][j])
+    end
+end
+
+function SpacePartition:updateSpaceMatrix(objectsToProcess, dt)
+    dt = dt or love.timer.getDelta()
+
+    if not _G.USE_SPACE_PARTITION then
+        return nil
+    end
+
+    if objectsToProcess == nil then
+        return nil
+    end
+
+    if self.updateCooldown <= 0 then
+        self.updateCooldown = 1 / self.updateRate
+
+        --Update
+
+        --Clear old matrix and then add objects
+        self:reInitSpaceMatric()
+        for i = 1, #objectsToProcess, 1 do
+            self:storeObjectIntoSpaceMatrix(objectsToProcess[i])
+        end
+    else
+        self.updateCooldown = self.updateCooldown - dt
+    end
+
+    return self.spaceMatrix
 end
 
 function SpacePartition:draw()
@@ -79,7 +137,7 @@ function SpacePartition:draw()
 end
 
 function SpacePartition:drawSpaceGrid()
-    if (_G.SHOW_SPACE_GRID) then
+    if _G.SHOW_SPACE_GRID then
         local currentX = self.cellWidt
         local currentY = self.cellHeight
 

@@ -12,19 +12,23 @@ _G.SHOW_SPACE_GRID = true
 _G.USE_SPACE_PARTITION = true --If the screen is large and there are a lot of objects it would benefit processing time
 
 ----INSTANTIATING A CLASS
+require("BaseObject")
+local LiveObjectArrayCls = require("LiveObjectArray")
+local StarsCls = require("Stars")
+local stars = nil
+
+local GameManagerCls = require("GameManager")
+local gameManager = nil
+
 local ShipCls = require("Ship") --import the class
 local ship = nil
-
-local LiveObjectArrayCls = require("LiveObjectArray")
 
 local EnemyCls = require("Enemy")
 local enemies = nil
 local spawnRate = 1
 local spawnCountdown = 0
 
-require("BaseObject")
-local StarsCls = require("Stars")
-local stars = nil
+
 
 local BulletsCls = require("Bullets")
 local bullets = nil
@@ -64,6 +68,10 @@ function love.load()
 
     stars = StarsCls.new(Model.starsParams)
     ship = ShipCls.new(Model.shipParams)
+
+    local gameManagerParams = { player = ship }
+    gameManager = GameManagerCls.new(gameManagerParams)
+
     bullets = BulletsCls.new()
     enemies = LiveObjectArrayCls.new()
 
@@ -96,31 +104,33 @@ end
 function love.update(dt)
     stars:update(dt)
 
-    ship:update(dt)
+    --ship:update(dt)
+    gameManager:update(dt)
     --spawnEnemy(dt)
     --enemies:update(dt)
-    fireBullets(dt)
+    --fireBullets(dt)
 
     bullets:update(dt)
 
-    spacePartion:update(dt)
-    spacePartion:calculateIndexesOfObject(ship, ship.position, ship.dimention)
+    spacePartion:updateSpaceMatrix({ ship }, dt)
+    --spacePartion:storeObjectIntoSpaceMatrix(ship)
 end
 
 function love.draw()
 
 
-    love.graphics.draw(AssetsManager.sprites.explosion, 0, 20)
+    --love.graphics.draw(AssetsManager.sprites.explosion, 0, 20)
 
 
     --note the function on the instance is called with a : rather than a .
     --calling a function with a : passes the calling instance as reference into the funciton, allowing you to use "self"
     stars:draw()
+    gameManager:draw()
     bullets:draw()
 
     spacePartion:draw()
 
-    ship:draw()
+    --ship:draw()
     enemies:draw()
 
 

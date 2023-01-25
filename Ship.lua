@@ -5,6 +5,8 @@ local Ship = classes.class(BaseObject)
 local Model = require("Model")
 local BulletCls = require("Bullet")
 
+--TODO: change calculate fire direction, remove angle shot and only make fireFunction and in it call ability functions!
+
 function Ship:init(params)
     BaseObject:init(params)
 
@@ -137,7 +139,7 @@ function Ship:update(dt)
 
 end
 
-function Ship:drawHealth()
+function Ship:drawHealthBar()
     --This const 500 and 300 should be some global or local variables for configuration of health bar size
     local healthBarHeightModifier = 500
     local healthBarWidthModifier = 400
@@ -156,7 +158,6 @@ function Ship:drawHealth()
     love.graphics.pop()
 
     --Here we can check and draw shield bar after the health bar
-    --TODO : draw shield
     if (self.shield > 0) then
         positionXStart = positionXStart + healthBarWidth
         healthBarWidth = self.shield * Model.stage.stageWidth / healthBarWidthModifier
@@ -170,7 +171,7 @@ end
 
 function Ship:draw()
     BaseObject:draw()
-    self:drawHealth()
+    self:drawHealthBar()
 end
 
 return Ship
