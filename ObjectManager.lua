@@ -1,5 +1,5 @@
 local classes = require("classes")
-local GameManager = classes.class()
+local ObjectManager = classes.class()
 
 local Model = require("Model")
 local LocalMath = require("LocalMath")
@@ -9,7 +9,7 @@ local BulletsCls = require("Bullets")
 local LiveObjectArrayCls = require("LiveObjectArray")
 
 --Pref if GameManager resives playerShip
-function GameManager:init(params)
+function ObjectManager:init(params)
     self.player = params.player or ShipCls.new(Model.shipParams)
     self.enemies = LiveObjectArrayCls.new()
     self.bullets = BulletsCls.new()
@@ -17,41 +17,39 @@ end
 
 --TODO: add enemies and remove everything from main!
 
-local function fire(gameManager, dt)
-    --FirePower
-    --[[
-        local playerBullet = ship:fireBullet(dt)
-    if (playerBullet) then
-        bullets:addPlayerBullet(playerBullet)
-    end
-    ]]
-    local playerBullets = gameManager.player:angleShots(dt)
+local function fire(objectManager, dt)
+    local playerBullets = objectManager.player:fireBullets(dt)
     if (playerBullets) then
         for i = 1, #playerBullets, 1 do
-            gameManager.bullets:addPlayerBullet(playerBullets[i])
+            objectManager.bullets:addPlayerBullet(playerBullets[i])
         end
     end
 
-    for index, enemy in ipairs(gameManager.enemies.liveObjectArray) do
-        local enemyBullet = enemy:fireBullet(dt)
-        if enemyBullet then
-            gameManager.bullets:addEnemyBullet(enemyBullet)
+
+    for index, enemy in ipairs(objectManager.enemies.liveObjectArray) do
+        local enemyBullets = enemy:fireBullets(dt)
+        if (enemyBullets) then
+            for i = 1, #enemyBullets, 1 do
+                objectManager.bullets:addEnemyBullet(enemyBullets[i])
+            end
         end
     end
 end
 
-function GameManager:update(dt)
+function ObjectManager:update(dt)
     self.player:update(dt)
+    self.enemies:update(dt)
     self.bullets:update(dt)
 
     fire(self, dt)
 end
 
-function GameManager:draw()
+function ObjectManager:draw()
     self.bullets:draw()
 
-    --draw enemies
     self.player:draw()
+    self.enemies:draw()
+
 end
 
-return GameManager
+return ObjectManager

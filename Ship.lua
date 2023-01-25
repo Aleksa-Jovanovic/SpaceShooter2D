@@ -8,7 +8,7 @@ local BulletCls = require("Bullet")
 --TODO: change calculate fire direction, remove angle shot and only make fireFunction and in it call ability functions!
 
 function Ship:init(params)
-    BaseObject:init(params)
+    BaseObject.init(self, params)
 
     self.health = params.health
     self.shield = params.shield or 40
@@ -41,20 +41,11 @@ function Ship:isMoveValid(moveVec, dt)
     end
 end
 
---Using the tag checks if bullet goes up or down
 function Ship:calculateBaseFireDirection()
-    if self.tag == Model.shipParams.tag then
-        return { x = 0, y = 1 }
-    end
-
-    if self.tag == Model.enemyParams.tag then
-        return { x = 0, y = 1 }
-    end
-
-    return { 0 }
+    return { x = 0, y = -1 }
 end
 
-function Ship:fireBullet(dt)
+function Ship:fireBullets(dt)
     dt = dt or love.timer.getDelta()
 
     if self.fireCooldown <= 0 then
@@ -65,14 +56,9 @@ function Ship:fireBullet(dt)
         local bulletPositionVec = { x = self.position.x, y = self.position.y }
         local bulletDirectionVec = self.calculateBaseFireDirection(self)
         newBullet:configureBullet(bulletPositionVec, bulletDirectionVec)
+        --newBullet:changeBulletAngleBy(math.rad(10))
 
-        if (self.tag == Model.shipParams.tag) then --!!!!!!!!!!TEST
-            --newBullet:changeBulletAngleBy(self.fireAngle)
-            --self.fireAngle = self.fireAngle + math.rad(10)
-            newBullet:setBulletAngle(math.rad(-45))
-        end
-
-        return newBullet
+        return { newBullet }
     else
         self.fireCooldown = self.fireCooldown - dt
     end
@@ -170,7 +156,7 @@ function Ship:drawHealthBar()
 end
 
 function Ship:draw()
-    BaseObject:draw()
+    BaseObject.draw(self)
     self:drawHealthBar()
 end
 

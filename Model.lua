@@ -30,9 +30,9 @@ Model.shipParams = {
     fireRate = 2,
 }
 
-Model.enemyParams = {
+Model.enemyL1Params = {
     assetName = "enemy",
-    tag = "Enemy",
+    tag = "Enemy1",
 
     speed = 50,
     health = 100,
@@ -62,7 +62,7 @@ Model.init = function()
 
     --init assets dynamically
     Model.shipParams.asset = AssetsManager.sprites[Model.shipParams.assetName]
-    Model.enemyParams.asset = AssetsManager.sprites[Model.enemyParams.assetName]
+    Model.enemyL1Params.asset = AssetsManager.sprites[Model.enemyL1Params.assetName]
     Model.bulletParams.asset = AssetsManager.sprites[Model.bulletParams.assetName]
 
     --define enemies here

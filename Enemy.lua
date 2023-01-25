@@ -1,49 +1,67 @@
 local classes = require("classes")
-local Ship = require("Ship")
-local Enemy = classes.class(Ship)
+local BaseObject = require("BaseObject")
+local Enemy = classes.class(BaseObject)
+
 local Model = require("Model")
 local BulletCls = require("Bullet")
 
 function Enemy:init(params)
-    print("Enemy init!")
+    BaseObject.init(self, params)
 
-    Ship:init(params) --!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    print(self.asset)
+    self.health = params.health or 100
+    --self.shield = params.shield or 0 --Some enemies may have shield
 
-    self.w = self.asset:getWidth()
+    self.position = params.position or self:setRandomPositionFromTop()
+    self.direction = params.direction or { x = 0, y = 1 }
+    self.speed = params.speed or 50
 
-    self.position = {}
-    self.position.x = self.w / 2 + math.random() * (Model.stage.stageWidth - self.w)
+    --Fire args
+    self.fireRate = params.fireRate or 0.5
+    self.fireCooldown = 0
+    self.fireAngle = 180 --Enemies fire down
+end
+
+function Enemy:setRandomPositionFromTop()
     self.position.y = 0
+    self.position.x = math.random(self.dimention.width, Model.stage.stageWidth - self.dimention.width)
 
+    return self.position
+end
+
+function Enemy:calculateBaseFireDirection()
+    return { x = 0, y = 1 }
+end
+
+function Enemy:fireBullets(dt)
+    dt = dt or love.timer.getDelta()
+
+    if self.fireCooldown <= 0 then
+        self.fireCooldown = 1 / self.fireRate
+
+        local newBullet = BulletCls.new(Model.bulletParams)
+
+        local bulletPositionVec = { x = self.position.x, y = self.position.y }
+        local bulletDirectionVec = Enemy:calculateBaseFireDirection()
+        newBullet:configureBullet(bulletPositionVec, bulletDirectionVec)
+
+        return { newBullet }
+    else
+        self.fireCooldown = self.fireCooldown - dt
+    end
+
+    return nil
 end
 
 function Enemy:update(dt)
-    self.position.y = self.position.y + (1 * self.speed * dt)
-    self.position.x = self.position.x + (0 * self.speed * dt) -- For now enemyShip can only go down and not horizontal
+    self.position.y = self.position.y + (self.direction.y * self.speed * dt)
+    self.position.x = self.position.x + (self.direction.x * self.speed * dt)
 
     return self
 end
 
-function Enemy:isValidPosition()
-    local currentY = self.position.y
-    if (currentY >= Model.stage.stageHeight + self.h / 2) then
-        return false
-    end
-
-    --[[
-    local currentX = self.position.x
-    if (currentX <= 0 or currentX >= Model.stage.stageWidth) then
-        return false
-    end
-    ]]
-
-    return true
-end
-
 function Enemy:draw()
-    local x = self.position.x
-    local y = self.position.y
-    love.graphics.draw(self.asset, x, y, 0, 1, 1, self.w / 2, self.h / 2)
+    BaseObject.draw(self)
 end
 
 return Enemy

@@ -1,15 +1,19 @@
 local classes = require("classes")
 local BaseObject = classes.class()
 
+local IDGenerator = require("IDGenerator")
+local Model = require("Model")
+
 --Every object should have a Tag, Image, Position, Angle, Dimention, Scale
 --Needed values are : Tag, Image, Position
 --Optional values are : Angle(default 0), Dimention(will get from Image), Scale(default is no scaling)
 function BaseObject:init(params)
+    self.objectID = IDGenerator.generateID()
 
     self.tag = params.tag or "BaseObject"
     self.asset = params.asset or nil --Default picture could be inserted
 
-    self.position = params.position or { x = 0, y = 0 }
+    self.position = params.position or { x = Model.stage.stageWidth / 2, y = Model.stage.stageHeight / 2 }
     self.dimention = params.dimention or { width = 0, height = 0 }
     self.angle = params.angle or 0
     self.scale = params.scale or { x = 1, y = 1 }
@@ -17,6 +21,8 @@ function BaseObject:init(params)
     if (self.asset) then
         self.dimention = { width = self.asset:getWidth() * self.scale.x, height = self.asset:getHeight() * self.scale.y }
     end
+
+    print("ObjectInit -> Tag - " .. self.tag .. " ID - " .. self.objectID)
 end
 
 function BaseObject:setScale(newScale)
@@ -24,6 +30,23 @@ function BaseObject:setScale(newScale)
     if (self.asset) then
         self.dimention = { width = self.asset:getWidth() * self.scale.x, height = self.asset:getHeight() * self.scale.y }
     end
+end
+
+--Check if the bullet is in screen bounds
+function BaseObject:isValidPosition()
+    local outScreenExtender = 80 --Maybe object will need to stay alive a bit longer when offscreen
+
+    local currentY = self.position.y
+    if (currentY <= 0 - outScreenExtender or currentY >= Model.stage.stageHeight + outScreenExtender) then
+        return false
+    end
+
+    local currentX = self.position.x
+    if (currentX <= 0 - outScreenExtender or currentX >= Model.stage.stageWidth + outScreenExtender) then
+        return false
+    end
+
+    return true
 end
 
 function BaseObject:update(dt)
