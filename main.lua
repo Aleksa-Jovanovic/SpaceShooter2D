@@ -48,22 +48,22 @@ local function spawnEnemy(dt)
     end
 end
 
-local function checkColision(object1, object2)
-    local colider1 = { position = {}, dimention = {} }
-    local colider2 = { position = {}, dimention = {} }
+local function checkCollision(object1, object2)
+    local collider1 = { position = {}, dimention = {} }
+    local collider2 = { position = {}, dimention = {} }
 
-    colider1.position.x = object1.position.x - object1.dimention.width / 2
-    colider1.position.y = object1.position.y - object1.dimention.height / 2
-    colider1.dimention = object1.dimention
+    collider1.position.x = object1.position.x - object1.dimention.width / 2
+    collider1.position.y = object1.position.y - object1.dimention.height / 2
+    collider1.dimention = object1.dimention
 
-    colider2.position.x = object2.position.x - object2.dimention.width / 2
-    colider2.position.y = object2.position.y - object2.dimention.height / 2
-    colider2.dimention = object2.dimention
+    collider2.position.x = object2.position.x - object2.dimention.width / 2
+    collider2.position.y = object2.position.y - object2.dimention.height / 2
+    collider2.dimention = object2.dimention
 
-    if (colider1.position.x < colider2.position.x + colider2.dimention.width and
-        colider1.position.x + colider1.dimention.width > colider2.position.x and
-        colider1.position.y < colider2.position.y + colider2.dimention.height and
-        colider1.position.y + colider1.dimention.height > colider2.position.y) then
+    if (collider1.position.x < collider2.position.x + collider2.dimention.width and
+        collider1.position.x + collider1.dimention.width > collider2.position.x and
+        collider1.position.y < collider2.position.y + collider2.dimention.height and
+        collider1.position.y + collider1.dimention.height > collider2.position.y) then
         return true
     end
     return false
@@ -92,7 +92,7 @@ function love.update(dt)
 
     for enemyIndex, enemy in pairs(objectManager.enemies.liveObjectArray) do
         for bulletIndex, bullet in pairs(objectManager.bullets.playerBulletsArray) do
-            if (checkColision(bullet, enemy)) then
+            if (checkCollision(bullet, enemy)) then
                 objectManager.enemies:removeObject(enemyIndex)
                 objectManager.bullets:removePlayerBullet(bulletIndex)
                 break
