@@ -8,7 +8,6 @@ local BulletCls = require("Bullet")
 function Enemy:init(params)
     BaseObject.init(self, params)
 
-    print(self.asset)
     self.health = params.health or 100
     --self.shield = params.shield or 0 --Some enemies may have shield
 
@@ -51,6 +50,14 @@ function Enemy:fireBullets(dt)
     end
 
     return nil
+end
+
+function Enemy:takeDamage(damage)
+    self.health = self.health - damage
+    if self.health <= 0 then
+        self.health = 0
+        self.isValidInstance = false
+    end
 end
 
 function Enemy:update(dt)

@@ -17,13 +17,19 @@ function LiveObjectArray:update(dt)
 
     local objects = self.liveObjectArray
 
-    --Updating object position
+    --Updating object position and removing invalidInstances
     local index = 1
     local numberOfObjects = #objects
+    local isValidInstance = nil
     while index <= numberOfObjects do
         local object = objects[index]
-        local isValid = object:update(dt):isValidPosition()
-        if not isValid then
+
+        isValidInstance = object.isValidInstance
+        if isValidInstance --[[or isValidInstance == nil]] then
+            isValidInstance = object:update(dt):isValidPosition()
+        end
+
+        if not isValidInstance then
             self.removeObject(self, index)
             numberOfObjects = numberOfObjects - 1
         else

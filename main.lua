@@ -1,5 +1,6 @@
 --this is how you require files in directories
 package.path = package.path .. ";utils/?.lua;"
+package.path = package.path .. ";managers/?.lua"
 ----------------------
 --for debugging in zero brane, add breakpoints. be sure to activate "start debugging server" under "Project"
 require("mobdebug").start()
@@ -16,8 +17,9 @@ local LiveObjectArrayCls = require("LiveObjectArray")
 local StarsCls = require("Stars")
 local stars = nil
 
-local ObjectManagerCls = require("ObjectManager")
-local objectManager = nil
+local ObjectManager = require("ObjectManager")
+local CollisionManager = require("CollisionManager")
+--local objectManager = nil
 
 local ShipCls = require("Ship") --import the class
 local ship = nil
@@ -30,7 +32,6 @@ local AssetsManager = require("AssetsManager")
 local Model = require("Model")
 
 local SpacePartitionCls = require("SpacePartition")
-local spacePartion = nil
 
 local LEFT_KEY = "left"
 local RIGHT_KEY = "right"
@@ -42,13 +43,18 @@ local function spawnEnemy(dt)
         spawnCountdown = 1 / spawnRate
         local newEnemy = EnemyCls.new(Model.enemyL1Params)
 
-        objectManager.enemies:addObject(newEnemy)
+        ObjectManager.enemies:addObject(newEnemy)
     else
         spawnCountdown = spawnCountdown - dt
     end
 end
 
 local function checkCollision(object1, object2)
+    --Double check if some object is invalid, should be removed in the end
+    if (not object1.isValidInstance) or (not object2.isValidInstance) then
+        return false
+    end
+
     local collider1 = { position = {}, dimention = {} }
     local collider2 = { position = {}, dimention = {} }
 
@@ -74,40 +80,60 @@ function love.load()
     AssetsManager.init()
     Model.init()
 
+    --Create player
     stars = StarsCls.new(Model.starsParams)
     ship = ShipCls.new(Model.shipParams)
 
+    --Init managers
     local objectManagerParams = { player = ship }
-    objectManager = ObjectManagerCls.new(objectManagerParams)
+    ObjectManager:init(objectManagerParams)
+    CollisionManager:init()
 
-    spacePartion = SpacePartitionCls.new()
+
 end
 
 function love.update(dt)
     stars:update(dt)
 
-    objectManager:update(dt)
+    ObjectManager:update(dt)
+    CollisionManager:update(dt)
     spawnEnemy(dt)
 
+    --[[
+--Enemy get hit
+    for enemyIndex, enemy in pairs(ObjectManager.enemies.liveObjectArray) do
+        if not enemy.isValidInstance then --if previous bullet invalidated this enemy
+            goto continueInvalidEnemy --goto not good option but i didn't want to use nested ifs and there is no continue
+        end
 
-    for enemyIndex, enemy in pairs(objectManager.enemies.liveObjectArray) do
-        for bulletIndex, bullet in pairs(objectManager.bullets.playerBulletsArray) do
+        for bulletIndex, bullet in pairs(ObjectManager.bullets.playerBulletsArray) do
             if (checkCollision(bullet, enemy)) then
-                objectManager.enemies:removeObject(enemyIndex)
-                objectManager.bullets:removePlayerBullet(bulletIndex)
+
+                enemy:takeDamage(bullet.damage)
+                bullet:destroyBullet()
+
+                --objectManager.enemies:removeObject(enemyIndex)
+                --objectManager.bullets:removePlayerBullet(bulletIndex)
                 break
             end
         end
+        ::continueInvalidEnemy::
     end
 
+    --Plaeyr getHit
 
-    spacePartion:updateSpaceMatrix({ ship }, dt)
-    --spacePartion:storeObjectIntoSpaceMatrix(ship)
+    for bulletIndex, bullet in pairs(ObjectManager.bullets.enemyBulletsArray) do
+        if (checkCollision(bullet, ObjectManager.player)) then
+
+            ship:takeDamage(bullet.damage)
+            bullet:destroyBullet()
+        end
+    end
+]]
+
 end
 
 function love.draw()
-
-
     --love.graphics.draw(AssetsManager.sprites.explosion, 0, 20)
 
 
@@ -115,9 +141,8 @@ function love.draw()
     --calling a function with a : passes the calling instance as reference into the funciton, allowing you to use "self"
     stars:draw()
 
-    objectManager:draw()
-    spacePartion:draw()
-
+    ObjectManager:draw()
+    CollisionManager:draw()
 
     --Show current FPS
     local fps = love.timer.getFPS()

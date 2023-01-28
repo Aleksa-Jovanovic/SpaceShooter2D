@@ -4,7 +4,7 @@ local SpacePartition = classes.class()
 local Model = require("Model")
 local LocalMath = require("LocalMath")
 
-function SpacePartition:init(params)
+function SpacePartition:init()
     self.colNum = Model.spacePartitionParam.colNumber
     self.rowNum = Model.spacePartitionParam.rowNumber
     self.stageWidth = Model.stage.stageWidth
@@ -16,7 +16,7 @@ function SpacePartition:init(params)
 
     --Maybe we dont need to update spaceMatrix on every love.update(dt)
     --It can update once every 1/updateRate
-    self.updateRate = params.updateRate or 10
+    self.updateRate = Model.spacePartitionParam.updateRate or 10
     self.updateCooldown = 0
 
     --Each element of matrix contains objects that are in that part of the screen
@@ -87,11 +87,11 @@ function SpacePartition.calculatePreciseIndex(objectPosition, stageWith)
     return objectPosition.y * (stageWith) + objectPosition.x
 end
 
---TODO: check and see should you use some kind of preciseIndex
+--TODO: check and see should you use some kind of preciseIndex (ID could be used as an index/hash)
 function SpacePartition:storeObjectIntoSpaceMatrix(object)
     local objectIndexes = self:calculateIndexesOfObject(object)
 
-    for _, index in ipairs(objectIndexes) do
+    for _, index in pairs(objectIndexes) do
         local i = index.row
         local j = index.col
         local preciseIndex = SpacePartition.calculatePreciseIndex(object.position, self.stageWidth)
@@ -117,6 +117,7 @@ function SpacePartition:updateSpaceMatrix(objectsToProcess, dt)
         self.updateCooldown = 1 / self.updateRate
 
         --Update
+        print("Updateing spacePartition!")
 
         --Clear old matrix and then add objects
         self:reInitSpaceMatric()
@@ -124,10 +125,28 @@ function SpacePartition:updateSpaceMatrix(objectsToProcess, dt)
             self:storeObjectIntoSpaceMatrix(objectsToProcess[i])
         end
     else
+        print("Not updateing spacePartition, cooldows = " .. self.updateCooldown)
         self.updateCooldown = self.updateCooldown - dt
     end
 
     return self.spaceMatrix
+end
+
+function SpacePartition:getCollideCandidates(collidingObject)
+    local collideCandidates = {}
+
+    local collidingObjectIndexes = self:calculateIndexesOfObject(collidingObject)
+
+    for _, index in pairs(collidingObjectIndexes) do
+        local i = index.row
+        local j = index.col
+
+        for _, collideCandidate in pairs(self.spaceMatrix[i][j]) do
+            table.insert(collideCandidates, collideCandidate)
+        end
+    end
+
+    return collideCandidates
 end
 
 function SpacePartition:draw()

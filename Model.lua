@@ -9,10 +9,11 @@ local Model = {
     }
 }
 
+--! TODO configure updateRate, for now 1 looks ok!
 Model.spacePartitionParam = {
     rowNumber = 20,
     colNumber = 10,
-    updateRate = 0.002
+    updateRate = 1
 }
 
 Model.starsParams = {
@@ -45,7 +46,7 @@ Model.bulletParams = {
     tag = "Bullet",
 
     speed = 100,
-    damage = 25
+    damage = 50
 }
 
 

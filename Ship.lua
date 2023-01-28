@@ -94,6 +94,26 @@ function Ship:angleShots(dt)
     return nil
 end
 
+function Ship:isAlive()
+    return self.isValidInstance
+end
+
+function Ship:takeDamage(damage)
+    if self.shield > damage then
+        self.shield = self.shield - damage
+        damage = 0
+    elseif self.shield > 0 then
+        damage = damage - self.shield
+        self.shield = 0
+    end
+
+    self.health = self.health - damage
+    if self.health <= 0 then
+        self.health = 0
+        self.isValidInstance = false
+    end
+end
+
 function Ship:update(dt)
     local left = Model.movement.left
     local right = Model.movement.right

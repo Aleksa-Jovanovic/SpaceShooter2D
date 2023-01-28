@@ -27,6 +27,10 @@ function Bullet:configureBullet(position, direction, speed)
     end
 end
 
+function Bullet:destroyBullet()
+    self.isValidInstance = false
+end
+
 --Variable angle is in radians
 function Bullet:changeBulletAngleBy(angle)
     local newAngle = self.angle + angle

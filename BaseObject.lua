@@ -9,6 +9,7 @@ local Model = require("Model")
 --Optional values are : Angle(default 0), Dimention(will get from Image), Scale(default is no scaling)
 function BaseObject:init(params)
     self.objectID = IDGenerator.generateID()
+    self.isValidInstance = true
 
     self.tag = params.tag or "BaseObject"
     self.asset = params.asset or nil --Default picture could be inserted
