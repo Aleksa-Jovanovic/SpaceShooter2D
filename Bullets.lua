@@ -22,8 +22,37 @@ function Bullets:removePlayerBullet(bulletPos)
     table.remove(self.playerBulletsArray, bulletPos)
 end
 
+function Bullets:updateBulletArray(dt, bulletArray)
+
+    --Updating bullet position and removing invalidInstances
+    local index = 1
+    local numberOfBullets = #bulletArray
+    local isValidInstance = nil
+
+    while index <= numberOfBullets do
+        local bullet = bulletArray[index]
+
+        isValidInstance = bullet.isValidInstance
+        if isValidInstance --[[or isValidInstance == nil]] then
+            isValidInstance = bullet:update(dt):isValidPosition()
+        end
+
+        if not isValidInstance then
+            table.remove(bulletArray, index)
+            numberOfBullets = numberOfBullets - 1
+        else
+            index = index + 1
+        end
+    end
+
+end
+
 function Bullets:update(dt)
 
+    self:updateBulletArray(dt, self.enemyBulletsArray)
+    self:updateBulletArray(dt, self.playerBulletsArray)
+
+    --[[
     --Update position of bullets
     local enemyBullets = self.enemyBulletsArray
     local playerBullets = self.playerBulletsArray
@@ -31,6 +60,8 @@ function Bullets:update(dt)
     --Updating enemyBulletsArray
     local index = 1
     local numberOfBullets = #enemyBullets
+    local isValidInstance = nil
+
     while index <= numberOfBullets do
         local bullet = enemyBullets[index]
         local isValid = bullet:update(dt):isValidPosition()
@@ -55,7 +86,7 @@ function Bullets:update(dt)
             index = index + 1
         end
     end
-
+]]
 end
 
 function Bullets:draw()
