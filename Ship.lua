@@ -11,7 +11,7 @@ function Ship:init(params)
     BaseObject.init(self, params)
 
     self.health = params.health
-    self.shield = params.shield or 40
+    self.shield = params.shield or 0
     self.speed = params.speed
 
     --Fire args
@@ -20,8 +20,9 @@ function Ship:init(params)
     self.fireAngle = 0
 
     --Abilities
-    self.abilityStatusArray = { trippleFire = false, angleFire = false }
-    self.fireAbilitiesArray = {} -- {abilityType, abilityDurationLeft, abilityFunction(bullets) : bullets}
+    self.abilityStatusArray = {} --abilityTag is a key for search, if a value is nil then there is no ability
+    self.fireAbilitiesArray = {} -- {duration, updateFunc : bullets, cancelFunc}
+    self.genericAbilitiesArray = {} --{duration, cancelFunc} maybe add scaleOfDetection
 end
 
 function Ship:isMoveValid(moveVec, dt)
@@ -56,43 +57,16 @@ function Ship:fireBullets(dt)
         local bulletPositionVec = { x = self.position.x, y = self.position.y }
         local bulletDirectionVec = self.calculateBaseFireDirection(self)
         newBullet:configureBullet(bulletPositionVec, bulletDirectionVec)
-        --newBullet:changeBulletAngleBy(math.rad(10))
+        local firedBullets = { newBullet }
 
-        return { newBullet }
-    else
-        self.fireCooldown = self.fireCooldown - dt
-    end
-
-    return nil
-end
-
-function Ship:angleShots(dt)
-    --[[
-    if self.fireCooldown <= 0 then
-        self.fireCooldown = 1 / self.fireRate
-
-        local newBullets = {}
-        local bulletWidth = Model.bulletParams.asset:getWidth()
-        local startAngle = -15
-        local startXPosition = self.position.x - bulletWidth
-        for i = 1, 3, 1 do
-            local newBullet = BulletCls.new(Model.bulletParams)
-            local bulletPositionVec = { x = startXPosition, y = self.position.y }
-            local bulletDirectionVec = self.calculateBaseFireDirection(self)
-            newBullet:configureBullet(bulletPositionVec, bulletDirectionVec)
-            newBullet:setBulletAngle(math.rad(startAngle))
-            startAngle = startAngle + 15
-            startXPosition = startXPosition + bulletWidth
-
-            table.insert(newBullets, newBullet)
+        for _, ability in pairs(self.fireAbilitiesArray) do
+            firedBullets = ability:trigger(firedBullets, self.fireCooldown)
         end
 
-        return newBullets
+        return firedBullets
     else
         self.fireCooldown = self.fireCooldown - dt
     end
-    ]]
-
 
     return nil
 end
@@ -115,6 +89,10 @@ function Ship:takeDamage(damage)
         self.health = 0
         self.isValidInstance = false
     end
+end
+
+function Ship:increaseHealth(incHealth)
+    self.health = (self.health + incHealth) % 100
 end
 
 function Ship:update(dt)
@@ -146,6 +124,10 @@ function Ship:update(dt)
         self.position.y = self.position.y + (y * self.speed * dt)
     end
 
+    --Check if some generic ability needs to be turned of
+    for _, ability in pairs(self.genericAbilitiesArray) do
+        ability:tick(dt)
+    end
 end
 
 function Ship:drawHealthBar()

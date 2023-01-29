@@ -41,6 +41,7 @@ function Explosion:draw()
 
     self.scale.x = 1 * self.scalingFactor
     self.scale.y = 1 * self.scalingFactor
+
     if self.explosionDuration > 0 then
         BaseObject.draw(self)
     end

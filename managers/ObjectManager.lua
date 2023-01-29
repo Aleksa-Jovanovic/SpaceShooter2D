@@ -8,6 +8,21 @@ local BulletsCls = require("Bullets")
 local ExplosionCls = require("Explosion")
 local LiveObjectArrayCls = require("LiveObjectArray")
 
+local FireAnglesPowerUpCls = require("FireAnglesPowerUp")
+local FireRatePowerUpCls = require("FireRatePowerUp")
+local ShieldPowerUpCls = require("ShieldPowerUp")
+local HealthPowerUpCls = require("HealthPowerUp")
+local CoinPowerUpCls = require("CoinPowerUp")
+
+local PowerUpCls = { FireAnglesPowerUpCls, FireRatePowerUpCls, ShieldPowerUpCls, HealthPowerUpCls, CoinPowerUpCls }
+local PowerUpParams = {
+    Model.powerUpParams.fireAngles,
+    Model.powerUpParams.fireRate,
+    Model.powerUpParams.shield,
+    Model.powerUpParams.health,
+    Model.powerUpParams.coin
+}
+
 local ObjectManager = {}
 
 --ObjectManager needs player to initialize
@@ -17,6 +32,8 @@ function ObjectManager:init(params)
     self.bullets = BulletsCls.new()
 
     self.explosions = LiveObjectArrayCls.new()
+    self.powerUps = LiveObjectArrayCls.new()
+    self.powerUpChance = 0.3
 
     self.scoreManager = ScoreManager
 end
@@ -24,6 +41,10 @@ end
 --BEGIN -> Getters for arrays
 function ObjectManager:getEnemies()
     return self.enemies.liveObjectArray
+end
+
+function ObjectManager:getPowerUps()
+    return self.powerUps.liveObjectArray
 end
 
 function ObjectManager:getEnemyBullets()
@@ -60,8 +81,7 @@ local function fire(objectManager, dt)
 end
 
 function ObjectManager:createExplosion(explodingObject)
-    local positionOfExplosion = explodingObject.position
-
+    local positionOfExplosion = { x = explodingObject.position.x, y = explodingObject.position.y }
     local explosionParams = Model.explosionParams
     explosionParams.position = positionOfExplosion
 
@@ -71,6 +91,21 @@ end
 
 --TODO: create a function to add a power up to the map when enemy is destroyed
 function ObjectManager:createPowerUp(destroyedEnemy)
+    local shouldCreatePowerUp = math.random()
+
+    if shouldCreatePowerUp > self.powerUpChance then
+        return
+    end
+
+    local powerUpIndex = math.random(1, #PowerUpCls)
+    local specificPowerUpCls = PowerUpCls[powerUpIndex]
+    local specificPowerUpParams = PowerUpParams[powerUpIndex]
+
+    local position = { x = destroyedEnemy.position.x, y = destroyedEnemy.position.y }
+    specificPowerUpParams.position = position
+
+    local newPowerUp = specificPowerUpCls.new(specificPowerUpParams)
+    self.powerUps:addObject(newPowerUp)
 end
 
 function ObjectManager:handleRemovedEnemies(removedEnemies)
@@ -104,6 +139,7 @@ function ObjectManager:update(dt)
     self.player:update(dt)
     local removedEnemies = self.enemies:update(dt)
     local removedBullets = self.bullets:update(dt)
+    self.powerUps:update(dt)
 
     fire(self, dt)
 
@@ -120,6 +156,7 @@ function ObjectManager:draw()
     self.enemies:draw()
 
     self.explosions:draw()
+    self.powerUps:draw()
 end
 
 return ObjectManager

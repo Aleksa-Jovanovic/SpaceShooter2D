@@ -59,6 +59,46 @@ Model.bulletParams = {
     damage = 50
 }
 
+Model.powerUpParams = {
+    fireAngles = {
+        assetName = "fireAngles",
+        tag = "FireAnglesPowerUp",
+
+        speed = 200,
+        duration = 5,
+        bulletAngleChange = 20
+    },
+    fireRate = {
+        assetName = "fireRate",
+        tag = "FireRatePowerUp",
+
+        speed = 200,
+        duration = 5
+    },
+    shield = {
+        assetName = "shield",
+        tag = "ShieldPowerUp",
+
+        speed = 150,
+        duration = 10,
+        shieldStrenght = 50
+    },
+    health = {
+        assetName = "health",
+        tag = "HealPowerUp",
+
+        speed = 150,
+        healStrenght = 30
+    },
+    coin = {
+        assetName = "coin",
+        tag = "CoinPowerUp",
+
+        speed = 300,
+        scoreValue = 75
+    },
+    magnet = {}
+}
 
 Model.init = function()
     Model.stage = {
@@ -72,6 +112,13 @@ Model.init = function()
     Model.enemyL1Params.asset = AssetsManager.sprites[Model.enemyL1Params.assetName]
     Model.bulletParams.asset = AssetsManager.sprites[Model.bulletParams.assetName]
     Model.explosionParams.asset = AssetsManager.sprites[Model.explosionParams.assetName]
+
+    --init powerUp assets
+    Model.powerUpParams.fireAngles.asset = AssetsManager.sprites[Model.powerUpParams.fireAngles.assetName]
+    Model.powerUpParams.fireRate.asset = AssetsManager.sprites[Model.powerUpParams.fireRate.assetName]
+    Model.powerUpParams.shield.asset = AssetsManager.sprites[Model.powerUpParams.shield.assetName]
+    Model.powerUpParams.health.asset = AssetsManager.sprites[Model.powerUpParams.health.assetName]
+    Model.powerUpParams.coin.asset = AssetsManager.sprites[Model.powerUpParams.coin.assetName]
 
     --define enemies here
     Model.shipParams.position = { x = Model.stage.stageWidth / 2, y = Model.stage.stageHeight / 2 }

@@ -7,6 +7,7 @@ local wave1 = {
     durationBetweenInnerWaves = 5,
     durationAfterWave = 10,
     waveScoreValue = 100,
+    spaceBetweenEnemies = 20,
     innerWaves = {
         { 0, 1, 1, 0, 1, 1, 0 },
         { 1, 0, 1, 0, 1, 0, 1 },
@@ -18,6 +19,7 @@ local wave2 = {
     durationBetweenInnerWaves = 5,
     durationAfterWave = 10,
     waveScoreValue = 100,
+    spaceBetweenEnemies = 20,
     innerWaves = {
         { 0, 1, 1, 0, 1, 1, 0 },
         { 1, 0, 1, 0, 1, 0, 1 },

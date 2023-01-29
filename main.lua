@@ -1,6 +1,7 @@
 --this is how you require files in directories
 package.path = package.path .. ";utils/?.lua;"
 package.path = package.path .. ";managers/?.lua"
+package.path = package.path .. ";powerUps/?.lua"
 ----------------------
 --for debugging in zero brane, add breakpoints. be sure to activate "start debugging server" under "Project"
 require("mobdebug").start()
@@ -9,8 +10,8 @@ require("mobdebug").start()
 io.stdout:setvbuf("no")
 
 --GLOBAL Variable
-_G.SHOW_SPACE_GRID = true
-_G.USE_SPACE_PARTITION = false --If the screen is large and there are a lot of objects it would benefit processing time
+_G.SHOW_SPACE_GRID = false
+_G.USE_SPACE_PARTITION = true --If the screen is large and there are a lot of objects it would benefit processing time
 
 ----INSTANTIATING A CLASS
 local LiveObjectArrayCls = require("LiveObjectArray")

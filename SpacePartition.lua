@@ -116,16 +116,12 @@ function SpacePartition:updateSpaceMatrix(objectsToProcess, dt)
     if self.updateCooldown <= 0 then
         self.updateCooldown = 1 / self.updateRate
 
-        --Update
-        print("Updateing spacePartition!")
-
         --Clear old matrix and then add objects
         self:reInitSpaceMatric()
         for i = 1, #objectsToProcess, 1 do
             self:storeObjectIntoSpaceMatrix(objectsToProcess[i])
         end
     else
-        print("Not updateing spacePartition, cooldows = " .. self.updateCooldown)
         self.updateCooldown = self.updateCooldown - dt
     end
 
@@ -140,6 +136,14 @@ function SpacePartition:getCollideCandidates(collidingObject)
     for _, index in pairs(collidingObjectIndexes) do
         local i = index.row
         local j = index.col
+
+        if self.spaceMatrix[i] == nil then
+            return collideCandidates
+        end
+
+        if self.spaceMatrix[i][j] == nil then
+            return collideCandidates
+        end
 
         for _, collideCandidate in pairs(self.spaceMatrix[i][j]) do
             table.insert(collideCandidates, collideCandidate)

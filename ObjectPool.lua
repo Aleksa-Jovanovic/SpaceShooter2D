@@ -20,7 +20,6 @@ function ItemPool:createNewObject()
     self.objectArray[newObject.objectID] = newObject
     self.flagArray[newObject.objectID] = OBJECT_FREE
 
-    --print("New object created : " .. newObject.tag)
     return newObject
 end
 
@@ -35,7 +34,6 @@ function ItemPool:getNextFreeObject()
 
     --If there is free object return it
     if freeObjectKey ~= 0 then
-        print("There is a free " .. self.objectArray[freeObjectKey].tag)
         self.flagArray[freeObjectKey] = OBJECT_NOT_FREE
 
         return self.objectArray[freeObjectKey]

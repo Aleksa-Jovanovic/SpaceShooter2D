@@ -12,7 +12,6 @@ function Bullet:init(params)
     self.damage = params.damage or 50
     self.direction = params.direction or { x = 0, y = 0 }
 
-    self.angleModifier = params.angleModifier or 1 --!TO BE REMOVED
     self.angle = LocalMath.calculateAngleFromDirectionVector(self.direction)
 end
 
@@ -64,7 +63,7 @@ end]]
 --Update bullet position (with this it can travel left, right, and diagonal)
 function Bullet:update(dt)
     self.position.y = self.position.y + (self.direction.y * self.speed * dt)
-    self.position.x = self.position.x + (self.direction.x / self.angleModifier * self.speed * dt)
+    self.position.x = self.position.x + (self.direction.x * self.speed * dt)
 
     return self
 end

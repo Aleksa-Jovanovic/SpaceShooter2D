@@ -81,6 +81,15 @@ local function checkCollision_EnemyBullet_PlayerShip_Default(ObjectManager)
     end
 end
 
+local function checkCollision_PowerUp_PlayerShip_Default(ObjectManager)
+    for powerUpIndex, powerUp in pairs(ObjectManager:getPowerUps()) do
+        if (checkCollision(powerUp, ObjectManager.player)) then
+            powerUp:activate(ObjectManager.player)
+            powerUp:destroyPowerUp()
+        end
+    end
+end
+
 function CollisionManager:update(dt)
     --Check collision playerBullet <-> enemyShip
     if _G.USE_SPACE_PARTITION then
@@ -97,7 +106,7 @@ function CollisionManager:update(dt)
     checkCollision_PlayerShip_EnemyShip_Default(self.objectManager)
 
     --Checl collision with powerUps!!
-    --TODO create power ups when you kill enemies they drop powerUps and explode
+    checkCollision_PowerUp_PlayerShip_Default(self.objectManager)
 end
 
 function CollisionManager:draw()
