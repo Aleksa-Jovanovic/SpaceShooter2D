@@ -22,6 +22,14 @@ Model.starsParams = {
     numStars = 200
 }
 
+Model.explosionParams = {
+    assetName = "explosion",
+    tag = "Explosion",
+
+    explosionDuration = 2, -- duration in seconds
+    scalingFactor = 1.5
+}
+
 Model.shipParams = {
     assetName = "ship",
     tag = "Player",
@@ -35,17 +43,19 @@ Model.enemyL1Params = {
     assetName = "enemy",
     tag = "EnemyL1",
 
+    level = 1,
+
     speed = 50,
     health = 100,
     fireRate = 0.5,
-    maxNumOfEnemiesOnScreen = 20
+    scoreValue = 25,
 }
 
 Model.bulletParams = {
     assetName = "bullet",
     tag = "Bullet",
 
-    speed = 100,
+    speed = 150,
     damage = 50
 }
 
@@ -61,6 +71,7 @@ Model.init = function()
     Model.shipParams.asset = AssetsManager.sprites[Model.shipParams.assetName]
     Model.enemyL1Params.asset = AssetsManager.sprites[Model.enemyL1Params.assetName]
     Model.bulletParams.asset = AssetsManager.sprites[Model.bulletParams.assetName]
+    Model.explosionParams.asset = AssetsManager.sprites[Model.explosionParams.assetName]
 
     --define enemies here
     Model.shipParams.position = { x = Model.stage.stageWidth / 2, y = Model.stage.stageHeight / 2 }

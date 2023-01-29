@@ -1,6 +1,3 @@
-local Model = require("Model")
-local LocalMath = require("LocalMath")
-
 local ObjectManager = require("ObjectManager")
 local SpacePartitionCls = require("SpacePartition")
 

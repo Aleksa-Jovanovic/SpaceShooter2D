@@ -3,7 +3,7 @@ local BaseObject = require("BaseObject")
 local Ship = classes.class(BaseObject)
 
 local Model = require("Model")
-local BulletCls = require("Bullet")
+local ObjectPool = require("ObjectPool")
 
 --TODO: change calculate fire direction, remove angle shot and only make fireFunction and in it call ability functions!
 
@@ -51,7 +51,7 @@ function Ship:fireBullets(dt)
     if self.fireCooldown <= 0 then
         self.fireCooldown = 1 / self.fireRate
 
-        local newBullet = BulletCls.new(Model.bulletParams)
+        local newBullet = ObjectPool:getBullet()
 
         local bulletPositionVec = { x = self.position.x, y = self.position.y }
         local bulletDirectionVec = self.calculateBaseFireDirection(self)
@@ -67,6 +67,7 @@ function Ship:fireBullets(dt)
 end
 
 function Ship:angleShots(dt)
+    --[[
     if self.fireCooldown <= 0 then
         self.fireCooldown = 1 / self.fireRate
 
@@ -90,6 +91,8 @@ function Ship:angleShots(dt)
     else
         self.fireCooldown = self.fireCooldown - dt
     end
+    ]]
+
 
     return nil
 end

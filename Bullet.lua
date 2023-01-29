@@ -46,7 +46,7 @@ function Bullet:setBulletAngle(angle)
 end
 
 --Check if the bullet is in screen bounds
-function Bullet:isValidPosition()
+--[[function Bullet:isValidPosition()
 
     local currentY = self.position.y
     if (currentY <= 0 or currentY >= Model.stage.stageHeight) then
@@ -59,7 +59,7 @@ function Bullet:isValidPosition()
     end
 
     return true
-end
+end]]
 
 --Update bullet position (with this it can travel left, right, and diagonal)
 function Bullet:update(dt)

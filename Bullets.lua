@@ -24,6 +24,8 @@ end
 
 function Bullets:updateBulletArray(dt, bulletArray)
 
+    local removedBullets = {}
+
     --Updating bullet position and removing invalidInstances
     local index = 1
     local numberOfBullets = #bulletArray
@@ -34,59 +36,29 @@ function Bullets:updateBulletArray(dt, bulletArray)
 
         isValidInstance = bullet.isValidInstance
         if isValidInstance --[[or isValidInstance == nil]] then
-            isValidInstance = bullet:update(dt):isValidPosition()
+            isValidInstance = bullet:update(dt):isValid()
         end
 
         if not isValidInstance then
-            table.remove(bulletArray, index)
+            local removedBullet = table.remove(bulletArray, index)
             numberOfBullets = numberOfBullets - 1
+
+            table.insert(removedBullets, removedBullet)
         else
             index = index + 1
         end
     end
 
+    return removedBullets
 end
 
 function Bullets:update(dt)
+    local removedBullets = {}
 
-    self:updateBulletArray(dt, self.enemyBulletsArray)
-    self:updateBulletArray(dt, self.playerBulletsArray)
+    removedBullets.enemyBullets = self:updateBulletArray(dt, self.enemyBulletsArray)
+    removedBullets.playerBullets = self:updateBulletArray(dt, self.playerBulletsArray)
 
-    --[[
-    --Update position of bullets
-    local enemyBullets = self.enemyBulletsArray
-    local playerBullets = self.playerBulletsArray
-
-    --Updating enemyBulletsArray
-    local index = 1
-    local numberOfBullets = #enemyBullets
-    local isValidInstance = nil
-
-    while index <= numberOfBullets do
-        local bullet = enemyBullets[index]
-        local isValid = bullet:update(dt):isValidPosition()
-        if not isValid then
-            self.removeEnemyBullet(self, index)
-            numberOfBullets = numberOfBullets - 1
-        else
-            index = index + 1
-        end
-    end
-
-    --Updating playerBulletArray
-    local index = 1
-    local numberOfBullets = #playerBullets
-    while index <= numberOfBullets do
-        local bullet = playerBullets[index]
-        local isValid = bullet:update(dt):isValidPosition()
-        if not isValid then
-            self.removePlayerBullet(self, index)
-            numberOfBullets = numberOfBullets - 1
-        else
-            index = index + 1
-        end
-    end
-]]
+    return removedBullets
 end
 
 function Bullets:draw()

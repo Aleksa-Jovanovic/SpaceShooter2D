@@ -10,12 +10,16 @@ function LiveObjectArray:addObject(object)
 end
 
 function LiveObjectArray:removeObject(objectPos)
-    table.remove(self.liveObjectArray, objectPos)
+    return table.remove(self.liveObjectArray, objectPos)
 end
 
 function LiveObjectArray:update(dt)
 
     local objects = self.liveObjectArray
+    local removedObjects = {
+        outOfScreenViewObjects = {},
+        inScreenViewObjects = {}
+    }
 
     --Updating object position and removing invalidInstances
     local index = 1
@@ -23,20 +27,30 @@ function LiveObjectArray:update(dt)
     local isValidInstance = nil
     while index <= numberOfObjects do
         local object = objects[index]
+        local objectInvalidBeforeMove = false
 
         isValidInstance = object.isValidInstance
         if isValidInstance --[[or isValidInstance == nil]] then
-            isValidInstance = object:update(dt):isValidPosition()
+            isValidInstance = object:update(dt):isValid()
+        else
+            objectInvalidBeforeMove = true
         end
 
         if not isValidInstance then
-            self.removeObject(self, index)
+            local removedObject = self.removeObject(self, index)
             numberOfObjects = numberOfObjects - 1
+
+            if objectInvalidBeforeMove then
+                table.insert(removedObjects.inScreenViewObjects, removedObject)
+            else
+                table.insert(removedObjects.outOfScreenViewObjects, removedObject)
+            end
         else
             index = index + 1
         end
     end
 
+    return removedObjects
 end
 
 function LiveObjectArray:draw()

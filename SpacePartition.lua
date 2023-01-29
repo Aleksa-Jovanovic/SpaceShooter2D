@@ -96,9 +96,9 @@ function SpacePartition:storeObjectIntoSpaceMatrix(object)
         local j = index.col
         local preciseIndex = SpacePartition.calculatePreciseIndex(object.position, self.stageWidth)
 
-        --!self.spaceMatrix[i][j][preciseIndex] = object
-        table.insert(self.spaceMatrix[i][j], object)
-        --!print(#self.spaceMatrix[i][j])
+        if (self.spaceMatrix[i] ~= nil) then
+            table.insert(self.spaceMatrix[i][j], object)
+        end
     end
 end
 

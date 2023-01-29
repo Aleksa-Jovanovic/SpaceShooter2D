@@ -23,7 +23,7 @@ function BaseObject:init(params)
         self.dimention = { width = self.asset:getWidth() * self.scale.x, height = self.asset:getHeight() * self.scale.y }
     end
 
-    print("ObjectInit -> Tag - " .. self.tag .. " ID - " .. self.objectID)
+    --print("ObjectInit -> Tag - " .. self.tag .. " ID - " .. self.objectID)
 end
 
 function BaseObject:setScale(newScale)
@@ -33,18 +33,20 @@ function BaseObject:setScale(newScale)
     end
 end
 
---Check if the bullet is in screen bounds
-function BaseObject:isValidPosition()
+--Check if the object is in screen bounds
+function BaseObject:isValid()
     local outScreenExtender = 80 --Maybe object will need to stay alive a bit longer when offscreen
 
     local currentY = self.position.y
     if (currentY <= 0 - outScreenExtender or currentY >= Model.stage.stageHeight + outScreenExtender) then
-        return false
+        self.isValidInstance = false
+        return self.isValidInstance
     end
 
     local currentX = self.position.x
     if (currentX <= 0 - outScreenExtender or currentX >= Model.stage.stageWidth + outScreenExtender) then
-        return false
+        self.isValidInstance = false
+        return self.isValidInstance
     end
 
     return true

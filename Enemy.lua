@@ -3,15 +3,17 @@ local BaseObject = require("BaseObject")
 local Enemy = classes.class(BaseObject)
 
 local Model = require("Model")
-local BulletCls = require("Bullet")
+local ObjectPool = require("ObjectPool")
 
 function Enemy:init(params)
     BaseObject.init(self, params)
 
+    self.level = params.level
     self.health = params.health or 100
+    self.scoreValue = params.scoreValue or 10
     --self.shield = params.shield or 0 --Some enemies may have shield
 
-    self.position = params.position or self:setRandomPositionFromTop()
+    self.position = params.position or self:setRandomPositionFromTop() --TODO:remove this it will be configured later
     self.direction = params.direction or { x = 0, y = 1 }
     self.speed = params.speed or 50
 
@@ -28,6 +30,16 @@ function Enemy:setRandomPositionFromTop()
     return self.position
 end
 
+function Enemy:configureEnemy(position, direction, speed)
+    self.position = position or self.position
+    self.direction = direction or self.position
+    self.speed = speed or self.speed
+
+    if (direction) then
+        self.angle = LocalMath.calculateAngleFromDirectionVector(self.direction)
+    end
+end
+
 function Enemy:calculateBaseFireDirection()
     return { x = 0, y = 1 }
 end
@@ -38,7 +50,7 @@ function Enemy:fireBullets(dt)
     if self.fireCooldown <= 0 then
         self.fireCooldown = 1 / self.fireRate
 
-        local newBullet = BulletCls.new(Model.bulletParams)
+        local newBullet = ObjectPool:getBullet()
 
         local bulletPositionVec = { x = self.position.x, y = self.position.y }
         local bulletDirectionVec = Enemy:calculateBaseFireDirection()
