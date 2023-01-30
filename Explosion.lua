@@ -2,9 +2,6 @@ local classes = require("classes")
 local BaseObject = require("BaseObject")
 local Explosion = classes.class(BaseObject)
 
-local Model = require("Model")
-local LocalMath = require("LocalMath")
-
 function Explosion:init(params)
     BaseObject.init(self, params) --tag,img,pos
 

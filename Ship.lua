@@ -92,7 +92,10 @@ function Ship:takeDamage(damage)
 end
 
 function Ship:increaseHealth(incHealth)
-    self.health = (self.health + incHealth) % 100
+    self.health = self.health + incHealth
+    if self.health > 100 then
+        self.health = 100
+    end
 end
 
 function Ship:update(dt)

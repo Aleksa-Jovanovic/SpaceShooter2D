@@ -1,5 +1,7 @@
-local Model = require("Model")
+local classes = require("classes")
 local Stars = classes.class()
+
+local Model = require("Model")
 
 function Stars:init(params)
     print("Stars init!")

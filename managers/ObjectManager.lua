@@ -1,19 +1,20 @@
 local Model = require("Model")
 local ScoreManager = require("ScoreManager")
 local ObjectPool = require("ObjectPool")
-local LocalMath = require("LocalMath")
 
 local ShipCls = require("Ship")
 local BulletsCls = require("Bullets")
 local ExplosionCls = require("Explosion")
 local LiveObjectArrayCls = require("LiveObjectArray")
 
+--PowerUp Classes
 local FireAnglesPowerUpCls = require("FireAnglesPowerUp")
 local FireRatePowerUpCls = require("FireRatePowerUp")
 local ShieldPowerUpCls = require("ShieldPowerUp")
 local HealthPowerUpCls = require("HealthPowerUp")
 local CoinPowerUpCls = require("CoinPowerUp")
 
+--Array of powerUp classes with coresponding powerUpParams for those classes
 local PowerUpCls = { FireAnglesPowerUpCls, FireRatePowerUpCls, ShieldPowerUpCls, HealthPowerUpCls, CoinPowerUpCls }
 local PowerUpParams = {
     Model.powerUpParams.fireAngles,
@@ -25,7 +26,7 @@ local PowerUpParams = {
 
 local ObjectManager = {}
 
---ObjectManager needs player to initialize
+--!ObjectManager needs player to initialize
 function ObjectManager:init(params)
     self.player = params.player or ShipCls.new(Model.shipParams)
     self.enemies = LiveObjectArrayCls.new()
@@ -89,7 +90,6 @@ function ObjectManager:createExplosion(explodingObject)
     self.explosions:addObject(newExplosion)
 end
 
---TODO: create a function to add a power up to the map when enemy is destroyed
 function ObjectManager:createPowerUp(destroyedEnemy)
     local shouldCreatePowerUp = math.random()
 

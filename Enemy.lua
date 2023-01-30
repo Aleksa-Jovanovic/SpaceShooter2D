@@ -30,6 +30,13 @@ function Enemy:setRandomPositionFromTop()
     return self.position
 end
 
+function Enemy:setPosition(newPosition)
+    self.position.x = newPosition.x
+    self.position.y = newPosition.y
+
+    return self
+end
+
 function Enemy:configureEnemy(position, direction, speed)
     self.position = position or self.position
     self.direction = direction or self.position

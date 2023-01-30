@@ -1,15 +1,9 @@
 local classes = require("classes")
-local BaseObject = require("BaseObject")
-local ShieldPowerUp = classes.class(BaseObject)
+local PowerUp = require("PowerUp")
+local ShieldPowerUp = classes.class(PowerUp)
 
 function ShieldPowerUp:init(params) --Needs tag,img,posiotn,duration,speed
-    BaseObject.init(self, params) --tag,img,pos
-
-    self.owner = nil
-
-    self.speed = params.speed or 100
-    self.duration = params.duration or 5
-    self.direction = { x = 0, y = 1 } --always falls down
+    PowerUp.init(self, params)
 
     self.shieldStrenght = params.shieldStrenght
 end
@@ -39,17 +33,6 @@ function ShieldPowerUp:cancel(player)
 
     player.abilityStatusArray[self.tag] = false
     player.genericAbilitiesArray[self.tag] = nil
-end
-
-function ShieldPowerUp:update(dt)
-    self.position.y = self.position.y + (self.direction.y * self.speed * dt)
-    self.position.x = self.position.x + (self.direction.x * self.speed * dt)
-
-    return self
-end
-
-function ShieldPowerUp:destroyPowerUp()
-    self.isValidInstance = false
 end
 
 return ShieldPowerUp

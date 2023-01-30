@@ -1,8 +1,0 @@
-Ability object has :
-1) function taht gets triggered when it is picked.
-    That function will activate one time action or  
-    add the SECONF dunction to an object abilityArray
-2) SECOND function is a function that gets triggered every time    
-    in update/fire/draw function of the targeted object for
-    period described in duration variable of that abilityArray
-3) duartion variable that goes with SECOND function

@@ -4,7 +4,7 @@ package.path = package.path .. ";managers/?.lua"
 package.path = package.path .. ";powerUps/?.lua"
 ----------------------
 --for debugging in zero brane, add breakpoints. be sure to activate "start debugging server" under "Project"
-require("mobdebug").start()
+--require("mobdebug").start()
 
 --this is to make prints appear right away in zerobrane
 io.stdout:setvbuf("no")
@@ -13,44 +13,34 @@ io.stdout:setvbuf("no")
 _G.SHOW_SPACE_GRID = false
 _G.USE_SPACE_PARTITION = true --If the screen is large and there are a lot of objects it would benefit processing time
 
-----INSTANTIATING A CLASS
-local LiveObjectArrayCls = require("LiveObjectArray")
+----BEGIN -> INSTANTIATING A CLASS
+--Background
 local StarsCls = require("Stars")
 local stars = nil
 
-local ObjectManager = require("ObjectManager")
-local CollisionManager = require("CollisionManager")
-local ScoreManager = require("ScoreManager")
-local ObjectPool = require("ObjectPool")
---local objectManager = nil
-
-local ShipCls = require("Ship") --import the class
-local ship = nil
-
-local EnemyCls = require("Enemy")
-local spawnRate = 1
-local spawnCountdown = 0
-
-local AssetsManager = require("AssetsManager")
+--Data
 local Model = require("Model")
 
-local SpacePartitionCls = require("SpacePartition")
+--Managers
+local AssetsManager = require("AssetsManager")
+local ObjectManager = require("ObjectManager")
+local CollisionManager = require("CollisionManager")
+local WaveManager = require("WaveManager")
+local ScoreManager = require("ScoreManager")
+local ObjectPool = require("ObjectPool")
 
+--Player
+local ShipCls = require("Ship") --import the class
+local ship = nil
+----END -> INSTANTIATING A CLASS
+
+--Controls
 local LEFT_KEY = "left"
 local RIGHT_KEY = "right"
 local UP_KEY = "up"
 local DOWN_KEY = "down"
 
-local function spawnEnemy(dt)
-    if spawnCountdown <= 0 then
-        spawnCountdown = 1 / spawnRate
-        local newEnemy = ObjectPool:getEnemy(1)
 
-        ObjectManager.enemies:addObject(newEnemy)
-    else
-        spawnCountdown = spawnCountdown - dt
-    end
-end
 
 function love.load()
     print("love.load")
@@ -70,8 +60,7 @@ function love.load()
     local objectManagerParams = { player = ship }
     ObjectManager:init(objectManagerParams)
     CollisionManager:init()
-
-
+    WaveManager:init()
 end
 
 function love.update(dt)
@@ -80,13 +69,18 @@ function love.update(dt)
         return
     end
 
+    --Stop game if all levels are finished
+    if (WaveManager:isGameWon()) then
+        return
+    end
+
+    --Update background
     stars:update(dt)
 
+    --Main update
     ObjectManager:update(dt)
     CollisionManager:update(dt)
-    spawnEnemy(dt)
-
-
+    WaveManager:update(dt)
 end
 
 local function GameOver()
@@ -104,14 +98,27 @@ local function GameOver()
     love.graphics.draw(scoreText, scorePositionX, scorePositionY)
 end
 
-function love.draw()
-    --note the function on the instance is called with a : rather than a .
-    --calling a function with a : passes the calling instance as reference into the funciton, allowing you to use "self"
+local function GameWon()
+    local font = love.graphics.newFont(45)
+    local gameWon = "GAME WON"
 
+    gameWon = love.graphics.newText(font, { { 1, 1, 1 }, gameWon })
+    local gameWonPositionX = Model.stage.stageWidth / 2 - gameWon:getWidth() / 2
+    local gameWonPositionY = Model.stage.stageHeight / 2 - gameWon:getHeight() / 2
+    love.graphics.draw(gameWon, gameWonPositionX, gameWonPositionY)
+
+    local scoreText = ScoreManager:getScoreAsText()
+    local scorePositionX = Model.stage.stageWidth / 2 - scoreText:getWidth() / 2
+    local scorePositionY = gameWonPositionY - gameWon:getHeight() / 2
+    love.graphics.draw(scoreText, scorePositionX, scorePositionY)
+end
+
+function love.draw()
     --Show current FPS
     local fps = love.timer.getFPS()
     love.graphics.print("FPS : " .. fps, 0, 0)
 
+    --Draw background
     stars:draw()
 
     --If player is dead show score and GameOver text
@@ -120,9 +127,17 @@ function love.draw()
         return
     end
 
-    --Default draw functions
+
+    --If player won the game show GameWon and scor text
+    if (WaveManager:isGameWon()) then
+        GameWon()
+        return
+    end
+
+    --Main draw functions
     ObjectManager:draw()
     CollisionManager:draw()
+    WaveManager:draw()
     ScoreManager:draw()
 end
 
@@ -139,7 +154,7 @@ function love.keypressed(key)
         Model.movement.down = true
     end
 
-    if (not ObjectManager:isPlayerAlive()) then
+    if (not ObjectManager:isPlayerAlive() or WaveManager:isGameWon()) then
         if key == "r" then
             --Restart game
             love.load()

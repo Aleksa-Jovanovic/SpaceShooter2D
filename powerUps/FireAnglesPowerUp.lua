@@ -1,18 +1,12 @@
 local classes = require("classes")
-local BaseObject = require("BaseObject")
-local FireAnglesPowerUp = classes.class(BaseObject)
+local PowerUp = require("PowerUp")
+local FireAnglesPowerUp = classes.class(PowerUp)
 
 local Model = require("Model")
 local ObjectPool = require("ObjectPool")
 
 function FireAnglesPowerUp:init(params) --Needs tag,img,posiotn,duration,speed
-    BaseObject.init(self, params) --tag,img,pos
-
-    self.owner = nil
-
-    self.speed = params.speed or 100
-    self.duration = params.duration or 5
-    self.direction = { x = 0, y = 1 } --always falls down
+    PowerUp.init(self, params)
 
     self.bulletAngleChange = params.bulletAngleChange or 15
 end
@@ -64,17 +58,6 @@ end
 function FireAnglesPowerUp:cancel(player)
     player.abilityStatusArray[self.objectID] = false
     player.fireAbilitiesArray[self.objectID] = nil
-end
-
-function FireAnglesPowerUp:update(dt)
-    self.position.y = self.position.y + (self.direction.y * self.speed * dt)
-    self.position.x = self.position.x + (self.direction.x * self.speed * dt)
-
-    return self
-end
-
-function FireAnglesPowerUp:destroyPowerUp()
-    self.isValidInstance = false
 end
 
 return FireAnglesPowerUp

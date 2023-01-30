@@ -9,6 +9,8 @@ local Model = {
     }
 }
 
+--!Model file used as data
+
 --! TODO configure updateRate, for now 1 looks ok!
 Model.spacePartitionParam = {
     rowNumber = 20,
@@ -36,7 +38,7 @@ Model.shipParams = {
 
     speed = 500,
     health = 100,
-    fireRate = 2,
+    fireRate = 3,
 }
 
 Model.enemyL1Params = {
@@ -46,9 +48,21 @@ Model.enemyL1Params = {
     level = 1,
 
     speed = 50,
-    health = 100,
+    health = 40,
     fireRate = 0.5,
     scoreValue = 25,
+}
+
+Model.enemyL2Params = {
+    assetName = "enemy",
+    tag = "EnemyL2",
+
+    level = 2,
+
+    speed = 30,
+    health = 60,
+    fireRate = 1,
+    scoreValue = 50,
 }
 
 Model.bulletParams = {
@@ -56,7 +70,7 @@ Model.bulletParams = {
     tag = "Bullet",
 
     speed = 150,
-    damage = 50
+    damage = 20
 }
 
 Model.powerUpParams = {
@@ -109,9 +123,12 @@ Model.init = function()
 
     --init assets dynamically
     Model.shipParams.asset = AssetsManager.sprites[Model.shipParams.assetName]
-    Model.enemyL1Params.asset = AssetsManager.sprites[Model.enemyL1Params.assetName]
     Model.bulletParams.asset = AssetsManager.sprites[Model.bulletParams.assetName]
     Model.explosionParams.asset = AssetsManager.sprites[Model.explosionParams.assetName]
+
+    --init enemy assets dynamically
+    Model.enemyL1Params.asset = AssetsManager.sprites[Model.enemyL1Params.assetName]
+    Model.enemyL2Params.asset = AssetsManager.sprites[Model.enemyL2Params.assetName]
 
     --init powerUp assets
     Model.powerUpParams.fireAngles.asset = AssetsManager.sprites[Model.powerUpParams.fireAngles.assetName]
@@ -120,7 +137,6 @@ Model.init = function()
     Model.powerUpParams.health.asset = AssetsManager.sprites[Model.powerUpParams.health.assetName]
     Model.powerUpParams.coin.asset = AssetsManager.sprites[Model.powerUpParams.coin.assetName]
 
-    --define enemies here
     Model.shipParams.position = { x = Model.stage.stageWidth / 2, y = Model.stage.stageHeight / 2 }
 
 end

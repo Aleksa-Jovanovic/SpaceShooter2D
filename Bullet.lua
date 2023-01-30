@@ -2,7 +2,6 @@ local classes = require("classes")
 local BaseObject = require("BaseObject")
 local Bullet = classes.class(BaseObject)
 
-local Model = require("Model")
 local LocalMath = require("LocalMath")
 
 function Bullet:init(params)
@@ -43,22 +42,6 @@ function Bullet:setBulletAngle(angle)
     self.angle = angle
     self.direction = LocalMath.calculateDirectionVectorFromAngle(angle)
 end
-
---Check if the bullet is in screen bounds
---[[function Bullet:isValidPosition()
-
-    local currentY = self.position.y
-    if (currentY <= 0 or currentY >= Model.stage.stageHeight) then
-        return false
-    end
-
-    local currentX = self.position.x
-    if (currentX <= 0 or currentX >= Model.stage.stageWidth) then
-        return false
-    end
-
-    return true
-end]]
 
 --Update bullet position (with this it can travel left, right, and diagonal)
 function Bullet:update(dt)

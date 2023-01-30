@@ -39,7 +39,7 @@ function ItemPool:getNextFreeObject()
         return self.objectArray[freeObjectKey]
     end
 
-    --If there is no free object create anew one, save it and return it
+    --If there is no free object create a new one, save it and return it
     if freeObjectKey == 0 then
         local newObject = self:createNewObject()
         self.flagArray[newObject.objectID] = OBJECT_NOT_FREE
@@ -70,15 +70,18 @@ local ObjectPool = {}
 
 function ObjectPool:init()
 
+    --Create obejtPool for bullets
     local BulletCls = require("Bullet")
     local bulletPoolParams = { objectClass = BulletCls, objectInitParams = Model.bulletParams }
     self.bulletPool = ItemPool.new(bulletPoolParams)
 
+    --Create objectpool for enemies, for each new enemy add ItemPool
     local EnemyL1Cls = require("Enemy")
     local enemyL1PoolParams = { objectClass = EnemyL1Cls, objectInitParams = Model.enemyL1Params }
+    local enemyL2PoolParams = { objectClass = EnemyL1Cls, objectInitParams = Model.enemyL2Params }
     self.enemyPool = {
         ItemPool.new(enemyL1PoolParams), --L1
-        ItemPool.new(enemyL1PoolParams) --L2 for now same as L1
+        ItemPool.new(enemyL2PoolParams) --L2 for now fires same as L1
     }
 
 end
@@ -99,5 +102,5 @@ function ObjectPool:returnEnemy(enemy)
     self.enemyPool[enemy.level]:returnObject(enemy)
 end
 
-return ObjectPool
 --END -> ObjectPool Singleton
+return ObjectPool

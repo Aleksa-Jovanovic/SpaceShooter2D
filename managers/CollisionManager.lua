@@ -1,6 +1,8 @@
 local ObjectManager = require("ObjectManager")
 local SpacePartitionCls = require("SpacePartition")
 
+--!For improvment should add QuadTree or R-tree for better and more efficent collision detection
+--!Probably will add QuadTree as an option, for now it only has simple spacialPartitioning
 local CollisionManager = {}
 
 function CollisionManager:init()
